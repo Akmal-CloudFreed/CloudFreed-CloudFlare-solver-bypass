@@ -39,6 +39,7 @@ const delay = async (milliseconds) => await new Promise(resolve => setTimeout(re
  *   });
  */
 async function CloudFreed(url, proxy, headless) {
+  let chromeProcess;
   try {
     url = ValidateURL(url)
 
@@ -83,7 +84,7 @@ async function CloudFreed(url, proxy, headless) {
       return {
         success: false, 
         code: 500,
-        errormessage: "Error occured on our side: Chrome is not installed on server, please try again later."
+        errormessage: "Error occurred on our side: Chrome is not installed on the server, please try again later."
       }
     }
 
@@ -108,11 +109,11 @@ async function CloudFreed(url, proxy, headless) {
     ];
 
     // Launch Chrome in headless mode
-    const chromeProcess = await spawn("C:/Program Files/Google/Chrome/Application/Chrome.exe", chromeArgs, {
+    chromeProcess = await spawn("C:/Program Files/Google/Chrome/Application/Chrome.exe", chromeArgs, {
       detached: true,
       windowsHide: headless
     });
-    
+
     console.log('PID:', chromeProcess.pid)
 
     // Fetch Chrome version information
@@ -121,34 +122,69 @@ async function CloudFreed(url, proxy, headless) {
     // If WebSocket debugger URL is available, establish WebSocket connection
     if (versionInfo['webSocketDebuggerUrl']) {
       const websocket = versionInfo['webSocketDebuggerUrl'];
-      const ws = new WebSocket(websocket);
-      const solved = await WSManager(ws, url, agent);
 
-      console.log('WebSocket communication done!')
+      // Create a Promise that resolves when WebSocket communication is done
+      const websocketPromise = new Promise(async (resolve, reject) => {
+        try {
+          const ws = new WebSocket(websocket);
+          const solved = await WSManager(ws, url, agent);
+          resolve(solved);
+        } catch (error) {
+          if (chromeProcess) KillProcess(chromeProcess.pid);
+
+          reject(error);
+        }
+      });
+
+      // Use Promise.race() to handle timeout
+      const timeoutPromise = new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve(new Error('Timeout occurred'));
+        }, 90000); // 90 seconds timeout
+      });
+
+      // Wait for either websocketPromise or timeoutPromise to resolve
+      const result = await Promise.race([websocketPromise, timeoutPromise]);
+
+      // If result is from timeoutPromise, return timeout error
+      if (result instanceof Error && result.message === 'Timeout occurred') {
+        // Kill Chrome process
+        if (chromeProcess) KillProcess(chromeProcess.pid);
+
+        return {
+          success: false,
+          code: 500,
+          errormessage: "Error occurred on our side: Chrome process took too long to respond, this can be because your proxy is blacklisted or your proxy is WAY TOO FUCKING SLOW."
+        };
+      }
 
       // Delay before killing Chrome process
       await delay(500);
 
       // Terminate Chrome process
-      KillProcess(chromeProcess.pid)
+      if (chromeProcess) KillProcess(chromeProcess.pid);
 
-      return solved;
+      return result;
     } else {
+      if (chromeProcess) KillProcess(chromeProcess.pid);
+
       return {
         success: false,
         code: 500,
-        errormessage: "Eror occured on our side, please check your request or try again later."
+        errormessage: "Error occurred on our side: WebSocket debugger URL is not available."
       }
     }
 
   } catch(error) {
+    if (chromeProcess) KillProcess(chromeProcess.pid);
+
     return {
       success: false,
       code: 500,
       error,
-      errormessage: "Eror occured on our side, please check your request or try again later."
+      errormessage: "Error occurred on our side: " + error.message
     }
   }
 }
 
-export default CloudFreed
+export default CloudFreed;

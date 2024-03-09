@@ -14,6 +14,12 @@ async function xs() {
         while (true) {
           await delay(1000)
 
+          if (response.key >= 4) {
+            document.open();
+            document.write(`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>False</title><style>body{background-color:black;color:white;font-family:Arial,sans-serif;font-size:24px;text-align:center;margin:0;padding:100px 0;}</style></head><body>false</body></html>`);
+            document.close();
+          }
+
           chrome.runtime.sendMessage({ action: 'getAllCookies', data: window.location.hostname }, async function(response) {
             // Check if cf_clearance cookie exists
             const cfClearanceCookie = response.find(cookie => cookie.name === 'cf_clearance');
