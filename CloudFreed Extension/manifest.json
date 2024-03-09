@@ -1,0 +1,26 @@
+{
+    "manifest_version": 3,
+    "name": "D4RK: CFUCK",
+    "version": "0.1.2",
+    "description": "Automatically solve CloudFlare with automation. Locally, with Chrome extension.",
+    "permissions": ["storage", "cookies"],
+    "host_permissions": [
+        "<all_urls>"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": ["*://challenges.cloudflare.com/cdn-cgi/challenge-platform/*"],
+            "js": ["click.js"],
+            "run_at": "document_end",
+            "all_frames": true,
+            "match_about_blank": false
+        },
+        {
+            "matches": ["<all_urls>"],
+            "js": ["xs.js"]
+        }      
+    ]
+}
