@@ -25,6 +25,7 @@ const delay = async (milliseconds) => await new Promise(resolve => setTimeout(re
  * Initiates CloudFreed process to bypass Cloudflare protection.
  * @param {string} url - The URL protected by Cloudflare anti-bot.
  * @param {boolean} headless - Toggles if the browser will start with no GUI (hidden)
+ * @param {boolean} getOnlyCookie - Toggles if the browser closes after cookies are grabbed, disable to use with puppeteer.
  * @param {string} [proxy] - Optional proxy URL to use for the connection.
  * @returns {Promise<Object>} - A promise that resolves with the result of CloudFreed process.
  *                              The resolved object contains success status and additional data.
