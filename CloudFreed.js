@@ -24,6 +24,7 @@ const delay = async (milliseconds) => await new Promise(resolve => setTimeout(re
 /**
  * Initiates CloudFreed process to bypass Cloudflare protection.
  * @param {string} url - The URL protected by Cloudflare anti-bot.
+ * @param {boolean} headless - Toggles if the browser will start with no GUI (hidden)
  * @param {string} [proxy] - Optional proxy URL to use for the connection.
  * @returns {Promise<Object>} - A promise that resolves with the result of CloudFreed process.
  *                              The resolved object contains success status and additional data.
@@ -38,7 +39,7 @@ const delay = async (milliseconds) => await new Promise(resolve => setTimeout(re
  *     console.error(error);
  *   });
  */
-async function CloudFreed(url, proxy, headless) {
+async function CloudFreed(url, headless, getOnlyCookie, proxy) {
   let chromeProcess;
   try {
     url = ValidateURL(url)
@@ -128,6 +129,9 @@ async function CloudFreed(url, proxy, headless) {
         try {
           const ws = new WebSocket(websocket);
           const solved = await WSManager(ws, url, agent);
+          if (chromeProcess && getOnlyCookie == true) KillProcess(chromeProcess.pid);
+
+          solved["ws"] = websocket
           resolve(solved);
         } catch (error) {
           if (chromeProcess) KillProcess(chromeProcess.pid);
@@ -162,7 +166,7 @@ async function CloudFreed(url, proxy, headless) {
       await delay(500);
 
       // Terminate Chrome process
-      if (chromeProcess) KillProcess(chromeProcess.pid);
+      if (chromeProcess && getOnlyCookie == true) KillProcess(chromeProcess.pid);
 
       return result;
     } else {
