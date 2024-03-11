@@ -32,7 +32,7 @@ async function xs() {
               document.write(`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>True</title><style>body{background-color:black;color:white;font-family:Arial,sans-serif;font-size:24px;text-align:center;margin:0;padding:100px 0;}</style></head><body>true</body></html>`);
               document.close();
             } else {
-              console.log('no cf_clearance cookie...');
+              localStorage["xs"] ? undefined : console.log('no cf_clearance cookie...');
             }
           });
         }

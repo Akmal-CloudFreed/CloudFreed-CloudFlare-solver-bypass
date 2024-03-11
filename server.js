@@ -5,14 +5,17 @@ const url = "bloxmoon.com"
 
 const cf = await CloudFreed(url)
 
-console.log('CloudFreed result:', cf);
-console.log('CloudFreed json:', JSON.stringify(cf.json));
-
 const browser = await puppeteer.connect({ browserWSEndpoint: cf.ws })
 
 const pages = await browser.pages()
 
 const page = pages[0]
+
+page.setViewport({
+   width: 1024,
+   height: 1024,
+   deviceScaleFactor: 1
+})
 
 page.reload()
 
