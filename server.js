@@ -19,4 +19,4 @@ page.setViewport({
 
 page.reload()
 
-// do as you with with your cloudflare bypassed browser!
+// do as you wish with your cloudflare bypassed browser!

@@ -1,6 +1,6 @@
 {
     "manifest_version": 3,
-    "name": "D4RK: CFUCK",
+    "name": "D4RK: CloudFreed",
     "version": "0.1.2",
     "description": "Automatically solve CloudFlare with automation. Locally, with Chrome extension.",
     "permissions": ["storage", "cookies"],
