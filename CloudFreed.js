@@ -25,10 +25,12 @@ const delay = async (milliseconds) => await new Promise(resolve => setTimeout(re
  * Initiates CloudFreed process to bypass Cloudflare protection.
  * @param {string} url - The URL protected by Cloudflare anti-bot.
  * @param {boolean} headless - Toggles if the browser will start with no GUI (hidden)
- * @param {boolean} getOnlyCookie - Toggles if the browser closes after cookies are grabbed, disable to use with puppeteer.
  * @param {string} [proxy] - Optional proxy URL to use for the connection.
- * @returns {Promise<Object>} - A promise that resolves with the result of CloudFreed process.
- *                              The resolved object contains success status and additional data.
+ * @returns {Promise<{success: boolean, code: integer|undefined, error: string|undefined, errormessage: string|undefined, json: Array|undefined, header: string|undefined, cf_clearence: string|undefined, dataDir: string|undefined, port: integer|undefined}>} 
+ *          A promise that resolves with the result of the CloudFreed process. If successful, 
+ *          it returns an object with properties success (boolean), code (integer), and header (string). 
+ *          If an error occurs, it returns an object with properties success (boolean), code (integer), 
+ *          error (string or undefined), and errormessage (string).
  * @throws {Error} - Throws an error if any critical error occurs during the CloudFreed process.
  * @example
  * // Example usage:
@@ -40,7 +42,7 @@ const delay = async (milliseconds) => await new Promise(resolve => setTimeout(re
  *     console.error(error);
  *   });
  */
-async function CloudFreed(url, headless, getOnlyCookie, proxy) {
+async function CloudFreed(url, headless, proxy) {
   let chromeProcess;
   try {
     url = ValidateURL(url)
@@ -90,7 +92,7 @@ async function CloudFreed(url, headless, getOnlyCookie, proxy) {
       }
     }
 
-    const cloudflareBypassDir = path.join(homedir(), 'cf-bypass');
+    const cloudflareBypassDir = path.join(homedir(), 'CloudFreed');
 
     // Delete temporary user data folders
     await DeleteTempUserDataFolders(cloudflareBypassDir);
@@ -130,9 +132,9 @@ async function CloudFreed(url, headless, getOnlyCookie, proxy) {
         try {
           const ws = new WebSocket(websocket);
           const solved = await WSManager(ws, url, agent);
-          if (chromeProcess && getOnlyCookie == true) KillProcess(chromeProcess.pid);
-
-          solved["ws"] = websocket
+          if (chromeProcess) KillProcess(chromeProcess.pid);
+          solved["dataDir"] = dataDir
+          solved["port"] = port
           resolve(solved);
         } catch (error) {
           if (chromeProcess) KillProcess(chromeProcess.pid);
@@ -167,7 +169,7 @@ async function CloudFreed(url, headless, getOnlyCookie, proxy) {
       await delay(500);
 
       // Terminate Chrome process
-      if (chromeProcess && getOnlyCookie == true) KillProcess(chromeProcess.pid);
+      if (chromeProcess) KillProcess(chromeProcess.pid);
 
       return result;
     } else {
