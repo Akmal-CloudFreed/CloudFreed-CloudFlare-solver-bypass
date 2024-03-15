@@ -1,4 +1,9 @@
-# CloudFreed
+## STATUS: Active
+
+Updates are on the way!
+
+## Notice
+CloudFreed is 100% Free, CloudFreed can stop working at any time.
 
 ## Introduction
 CloudFreed is a powerful tool designed to bypass Cloudflare anti-bot protection, allowing users to access websites without being restricted by captchas or Cloudflare's security measures.
@@ -105,6 +110,11 @@ if (cf.success === true) {
 
 // do as you wish with your cloudflare bypassed page!
 ```
+## Contribution
+
+Suggestions and pull requests are welcomed!.
+
+---
 
 ## Note
 CloudFreed is intended for educational and research purposes only. Please use it responsibly and respect the terms of service of the websites you visit.
