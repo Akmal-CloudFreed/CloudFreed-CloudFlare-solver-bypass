@@ -9,6 +9,14 @@ v1.1.5 will fix all of these problems, please be patient!
 CloudFreed is 100% Free, CloudFreed can stop working at any time.
 
 ## Introduction
+<center>
+
+# <img src="html/CloudFreed.html" width="45" align="left"> hektCaptcha Extension
+
+# Centered Text
+
+</center>
+
 CloudFreed is a powerful tool designed to bypass Cloudflare anti-bot protection, allowing users to access websites without being restricted by captchas or Cloudflare's security measures.
 
 ## Installation
