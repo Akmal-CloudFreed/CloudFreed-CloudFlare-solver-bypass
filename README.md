@@ -13,6 +13,8 @@ Files may have problems loading correctly, this is because of the request interc
 <div style="text-align:center;">
   <img src="html/CloudFreed.png" alt="CloudFreed Logo" width="48" style="float:left; margin-right:10px;">
   <h1>CloudFreed v1.1.5</h1>
+
+  [Join the CloudFreed Server](https://discord.gg/7rRmBUDqKk/)
 </div>
 
 CloudFreed is a powerful tool designed to bypass Cloudflare anti-bot protection, allowing users to access websites without being restricted by captchas or Cloudflare's security measures.
