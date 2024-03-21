@@ -7,6 +7,7 @@ v1.1.5 will fix all of these problems, please be patient!
 
 ## Notice
 CloudFreed is 100% Free, CloudFreed can stop working at any time.
+Files may have problems loading correctly, this is because of the request interception. This may be fixed in the future!
 
 ## Introduction
 <div style="text-align:center;">
