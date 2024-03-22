@@ -48,6 +48,6 @@ User+Pass proxy examples:
     socks5://username:password@proxy.example.com:port
 */
 
-const cloudfreed = await cf.get()
+const cloudfreed = await cf.get(URL, headless)
 
 console.log(JSON.stringify(cloudfreed))
