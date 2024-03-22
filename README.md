@@ -1,9 +1,7 @@
 ## STATUS: Active
 
 Updates are on the way!
-Large update upcoming:
-Testers reported various errors, including proxy errors, CloudFreed not loading, and more.
-v1.1.5 will fix all of these problems, please be patient!
+V1.1.5 Just released, please report any errors in Issues.
 
 ## Notice
 CloudFreed is 100% Free, CloudFreed can stop working at any time.
