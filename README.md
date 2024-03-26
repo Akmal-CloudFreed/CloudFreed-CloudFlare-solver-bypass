@@ -4,6 +4,7 @@ Updates are on the way!
 V1.1.5 Just released, please report any errors in Issues.
 
 ## Notice
+If you like the repo, please consider starring it, starring repos will help it spread.
 CloudFreed is 100% Free, CloudFreed can stop working at any time.
 Files may have problems loading correctly, this is because of the request interception. This may be fixed in the future!
 
