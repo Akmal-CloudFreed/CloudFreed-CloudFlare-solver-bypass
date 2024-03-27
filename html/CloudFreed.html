@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>CloudFreed</title>
+        <link rel="icon" type="image/png" href="./CloudFreed.png">
+        <style>
+            body {
+                background-color: #141414; /* Darker background for better contrast */
+                color: white;
+                font-family: Arial, sans-serif;
+                text-align: center;
+                margin: 0;
+                padding: 100px 0;
+                position: relative;
+            }
+            .title {
+                font-size: 36px;
+            }
+            .title2 {
+                font-size: 24px;
+            }
+            .content {
+                margin-top: 50px;
+                padding: 20px;
+                border: 2px solid white;
+            }
+            .cloudfreed-container {
+                position: relative;
+                display: inline-block;
+            }
+            .cloudfreed-logo {
+                width: 128px;
+                height: auto;
+                position: relative;
+                animation: moveUpDown 2s infinite alternate;
+            }
+            .spinner {
+                width: 40px;
+                height: 40px;
+                border: solid 6px rgb(100, 0, 172); /* Changed color to blue */
+                border-radius: 50%;
+                border-right-color: transparent;
+                border-bottom-color: transparent;
+                animation: rotate 1s linear infinite;
+            }
+            .spinner-container {
+                position: absolute;
+                right: -5px;
+                animation: moveUpDown 2s infinite alternate;
+                margin-top: -20px;  /* Additional lift with margin-top */
+            }
+
+            @keyframes moveUpDown {
+                0% { top: -10px; }  /* Start position further up */
+                100% { top: 20px; }
+            }
+            @keyframes rotate {
+                from {
+                    transform: rotate(0deg);
+                }
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+            .escape {
+                color: red; /* Red text color for "ESCAPE CLOUDFLARE" */
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="cloudfreed-container">
+            <img src="./CloudFreed.png" alt="CloudFreed" class="cloudfreed-logo">
+            <div class="spinner-container">
+                <div class="spinner"></div>
+            </div>
+        </div>
+        <div class="content">
+            <h1>Welcome to CloudFreed Browser!</h1>
+            <p>🚀 CloudFreed is a revolutionary new browser designed to provide you with unparalleled freedom while browsing the web. 🌐</p>
+            <p>With CloudFreed, you can access any website without being restricted by annoying <span class="escape">captchas</span> or <span class="escape">Cloudflare's protection</span>. 🛡️</p>
+            <p>We believe in a free and open internet for everyone, and CloudFreed is our contribution to making that a reality. 🌟</p>
+        </div>
+        <br>
+            <div id="chromeVersion" class="title"></div>
+        </br>
+        <div class="title2">CloudFreed is safe for puppeteer or anything similar.</div>
+        <script>
+            window.onload = function() {
+                // Function to get Chrome version
+                function getChromeVersion() {
+                    var raw = navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./);
+                    return raw ? parseInt(raw[2], 10) : false;
+                }
+          
+                // Get Chrome version
+                var version = getChromeVersion();
+          
+                // Display Chrome version on the page
+                var message = "Relax, you're on ";
+
+                if (version) {
+                    message += "Chrome v" + version + ".";
+                } else {
+                    message += "a browser that is not Chrome.";
+                }
+
+                document.getElementById('chromeVersion').textContent = message;
+            };  
+        </script>
+    </body>
+</html>
