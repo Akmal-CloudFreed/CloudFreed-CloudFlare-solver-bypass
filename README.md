@@ -52,6 +52,13 @@ Find example in example.js
 
 Suggestions and pull requests are welcomed!.
 
+## Support the project
+
+Supporting the project will most likely contribute to the creation of newer versions, and maybe even newer projects!
+Please consider donating if you like the project.
+
+[Support me at ko-fi.com](https://ko-fi.com/akmal2)
+
 ---
 
 ## Note
