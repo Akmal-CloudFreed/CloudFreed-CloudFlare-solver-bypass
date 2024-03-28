@@ -1,7 +1,7 @@
 ## STATUS: Active
 
 Updates are on the way!
-V1.1.5 Just released, please report any errors in Issues.
+V1.2.1 Just released, please report any errors in Issues.
 
 ## Notice
 If you like the repo, please consider starring it, starring repos will help it spread.
@@ -11,7 +11,7 @@ Files may have problems loading correctly, this is because of the request interc
 ## Introduction
 <div style="text-align:center;">
   <img src="html/CloudFreed.png" alt="CloudFreed Logo" width="48" style="float:left; margin-right:10px;">
-  <h1>CloudFreed v1.1.5</h1>
+  <h1>CloudFreed v1.2.1</h1>
 
   [Join the CloudFreed Server](https://discord.gg/7rRmBUDqKk/)
 </div>
