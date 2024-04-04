@@ -1,59 +1,46 @@
 import CloudFreed from "./index.js"
+import puppeteer from "puppeteer";
 
-const cf = new CloudFreed()
+const shahah = new CloudFreed()
 
-/* 
-    response looks like this (if successfull)
-{
-    "success":true,
-    "cfClearance": {
-        "name":"cf_clearance",
-        "value":"xUPhCYPAI5KSXaILM0MME5s_H8LDcGZHPPY4TCbyHfc-1711067062-1.0.1.1-xGyoME96_S3HQzL6uJUWkr.2MXquizYEEIpbqyym2tfsD5hMzcUQeGRbK9.H85bA.QINqMgkpW7X9Y3nYG5_sQ",
-        "domain":".bloxmoon.com",
-        "path":"/",
-        "expires":1742603068.034552,
-        "size":161,
-        "httpOnly":true,
-        "secure":true,
-        "session":false,
-        "sameSite":"None",
-        "priority":"Medium",
-        "sameParty":false,
-        "sourceScheme":"Secure",
-        "sourcePort":443
-    },
-    "cfClearenceHeader":"cf_clearance=xUPhCYPAI5KSXaILM0MME5s_H8LDcGZHPPY4TCbyHfc-1711067062-1.0.1.1-xGyoME96_S3HQzL6uJUWkr.2MXquizYEEIpbqyym2tfsD5hMzcUQeGRbK9.H85bA.QINqMgkpW7X9Y3nYG5_sQ;",
-    "dataDir":"C:\\Users\\johna\\CloudFreed\\CloudFreed_1711067053915",
-    "port":58428
-}
-*/
+const instance = await shahah.start(false)
 
-// question mark means optional
-// args for cf.get: URL: string, headless?: boolean, proxy?: string
+console.log(instance)
 
-const URL = "bloxmoon.com" //example URL
+const UserAgent = instance.userAgent
 
-//optional: change this to a user-agent string
-const userAgent = null 
-//If not set to a string, it will use the default chromium user-agent.
+const clearance = await instance.SolveTurnstile("https://www.coinbase.com/password_resets/new///////////?visible_recaptcha=true")
 
-const headless = false //change if the browser has a head or not (visible: set to false, or invisible: set to true)
+instance.Close()
 
-//const proxy = "your proxy"
+//console.log(await shahah.Close())
+//console.log(await shahah.Close())
+console.log(clearance);
 
-/* proxy examples: 
-    http://192.168.1.1:45994
-    https://192.168.1.1:48212
-    socks4://192.168.1.1:12849
-    socks5://192.168.1.1:12849
+const cf = clearance.cfClearance;
 
-User+Pass proxy examples:
-    http://username:password@proxy.example.com:port
-    https://username:password@proxy.example.com:port
-    socks4://username:password@proxy.example.com:port
-    socks5://username:password@proxy.example.com:port
-*/
+(async () => {
+  // Launch a headless browser
+  const browser = await puppeteer.launch({
+    headless: false,
+    args: [
+        `--user-agent=${UserAgent}`
+    ]
+  });
 
-const cloudfreed = await cf.CloudFlare(URL, userAgent, headless)
+  // Create a new page
+  const page = await browser.newPage();
 
-console.log(JSON.stringify(cloudfreed))
+  // Set a cookie
+  await page.setCookie({
+    name: cf.name,
+    value: cf.value,
+    domain: cf.domain,
+    path: cf.path,
+    httpOnly: cf.httpOnly,
+    secure: cf.secure // Replace with the domain of the website
+  });
+
+  // Navigate to a website
+  await page.goto("https://www.coinbase.com/password_resets/new///////////?visible_recaptcha=true");
+})();
