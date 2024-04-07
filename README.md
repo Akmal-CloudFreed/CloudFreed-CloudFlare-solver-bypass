@@ -1,3 +1,6 @@
+## V3 WILL BE THE BEST CAPTCHA SOLVER TO EXIST.
+V3 will solve cloudflare's turnstile, including cf_3, datadome, hcaptcha, recaptcha, funcaptcha, over 200 types of textcaptchas, and AWS (might add more)
+
 ## STATUS: Active
 
 Updates are on the way!
