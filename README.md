@@ -27,7 +27,7 @@ Before using CloudFreed, ensure that you have Node.js installed on your system. 
 
 Once Node.js is installed, follow these steps to set up CloudFreed:
 
-1. Clone or download the CloudFreed repository to your local machine.
+1. Clone or download the CloudFreed repository to your local machine, you can get the latest download [here](https://github.com/Akmal-CloudFreed/CloudFreed-CloudFlare-bypass/archive/refs/heads/main.zip).
 2. Extract the file.
 3. Open a terminal and navigate to the directory where you have cloned/downloaded CloudFreed.
 4. Run the following command to install dependencies:
