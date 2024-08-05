@@ -9,7 +9,7 @@ console.log(instance)
 
 const UserAgent = instance.userAgent
 
-const clearance = await instance.SolveTurnstile("https://www.coinbase.com/password_resets/new///////////?visible_recaptcha=true")
+const clearance = await instance.SolveTurnstile("https://bloxmoon.com/")
 
 instance.Close()
 
@@ -42,5 +42,5 @@ const cf = clearance.cfClearance;
   });
 
   // Navigate to a website
-  await page.goto("https://www.coinbase.com/password_resets/new///////////?visible_recaptcha=true");
+  await page.goto("https://bloxmoon.com/");
 })();
