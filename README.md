@@ -15,7 +15,7 @@ Files may have problems loading correctly, this is because of the request interc
 ## Introduction
 <div style="text-align:center;">
   <img src="html/CloudFreed.png" alt="CloudFreed Logo" width="48" style="float:left; margin-right:10px;">
-  <h1>CloudFreed v2.0.1</h1>
+  <h1>CloudFreed v2.3.2</h1>
 
   [Join the CloudFreed Server](https://discord.gg/8F852cXVbX)
 </div>
