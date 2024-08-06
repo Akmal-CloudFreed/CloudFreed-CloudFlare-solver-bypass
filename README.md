@@ -7,6 +7,9 @@ Updates are on the way!
 V2.3.2 Just released, please report any errors in Issues.
 Running the same link more than once in the same instance will return the same cookie, planning on fixing this in either v3.0.1 or v2.0.2.
 
+## Discord Server
+[![Discord](https://img.shields.io/discord/1219437599740002445.svg?label=Discord&logo=discord&colorB=7289DA)](https://discord.gg/5ncqYYQTPN)
+
 ## Notice
 If you like the repo, please consider starring it, starring repos will help it spread.
 CloudFreed is 100% Free, CloudFreed can stop working at any time.
