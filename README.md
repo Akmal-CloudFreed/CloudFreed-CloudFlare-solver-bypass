@@ -4,7 +4,7 @@ V3 will solve cloudflare's turnstile, including cf_3, datadome, hcaptcha, recapt
 ## STATUS: Active
 
 Updates are on the way!
-V2.0.1 Just released, please report any errors in Issues.
+V2.3.2 Just released, please report any errors in Issues.
 Running the same link more than once in the same instance will return the same cookie, planning on fixing this in either v3.0.1 or v2.0.2.
 
 ## Notice
