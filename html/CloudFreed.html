@@ -1,114 +1,198 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>CloudFreed</title>
-        <link rel="icon" type="image/png" href="./CloudFreed.png">
-        <style>
-            body {
-                background-color: #141414; /* Darker background for better contrast */
-                color: white;
-                font-family: Arial, sans-serif;
-                text-align: center;
-                margin: 0;
-                padding: 100px 0;
-                position: relative;
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudFreed</title>
+    <link rel="icon" type="image/png" href="./CloudFreed.png">
+    <style>
+        body {
+            background-color: #121212;
+            color: #E0E0E0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 80px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            overflow: hidden;
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Ensure the canvas is behind the content */
+        }
+        .content {
+            background-color: #1E1E1E;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            margin-top: 30px;
+            border: 1px solid #333;
+            transition: transform 0.3s ease;
+        }
+        .cloudfreed-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: moveUpDown 2s infinite alternate;
+            transition: transform 0.3s ease;
+        }
+        .cloudfreed-logo {
+            width: 128px;
+            height: auto;
+            transition: transform 0.3s ease;
+        }
+        @keyframes pulsate {
+            0% {
+                transform: scale(1);
+                opacity: 1;
             }
-            .title {
-                font-size: 36px;
+            50% {
+                transform: scale(1.5);
+                opacity: 0.6;
             }
-            .title2 {
-                font-size: 24px;
+            100% {
+                transform: scale(1);
+                opacity: 1;
             }
-            .content {
-                margin-top: 50px;
-                padding: 20px;
-                border: 2px solid white;
-            }
-            .cloudfreed-container {
-                position: relative;
-                display: inline-block;
-            }
-            .cloudfreed-logo {
-                width: 128px;
-                height: auto;
-                position: relative;
-                animation: moveUpDown 2s infinite alternate;
-            }
-            .spinner {
-                width: 40px;
-                height: 40px;
-                border: solid 6px rgb(100, 0, 172); /* Changed color to blue */
-                border-radius: 50%;
-                border-right-color: transparent;
-                border-bottom-color: transparent;
-                animation: rotate 1s linear infinite;
-            }
-            .spinner-container {
-                position: absolute;
-                right: -5px;
-                animation: moveUpDown 2s infinite alternate;
-                margin-top: -20px;  /* Additional lift with margin-top */
-            }
+        }
+        @keyframes moveUpDown {
+            0% { transform: translateY(-10px); } 
+            100% { transform: translateY(10px); }
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #FFFFFF;
+        }
+        p {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .escape {
+            color: #FF4C4C;
+            font-weight: bold;
+        }
+        .title {
+            font-size: 24px;
+            margin-top: 40px;
+        }
+        .title2 {
+            font-size: 18px;
+            margin-top: 20px;
+        }
 
-            @keyframes moveUpDown {
-                0% { top: -10px; }  /* Start position further up */
-                100% { top: 20px; }
-            }
-            @keyframes rotate {
-                from {
-                    transform: rotate(0deg);
-                }
-                to {
-                    transform: rotate(360deg);
-                }
-            }
-            .escape {
-                color: red; /* Red text color for "ESCAPE CLOUDFLARE" */
-            }
-        </style>
-    </head>
+        /* Responsiveness */
+        @media (max-width: 600px) {
+            h1 { font-size: 24px; }
+            p { font-size: 16px; }
+            .cloudfreed-logo { width: 100px; }
+            .content { padding: 30px; }
+        }
 
-    <body>
-        <div class="cloudfreed-container">
-            <img src="./CloudFreed.png" alt="CloudFreed" class="cloudfreed-logo">
-            <div class="spinner-container">
-                <div class="spinner"></div>
-            </div>
-        </div>
-        <div class="content">
-            <h1>Welcome to CloudFreed Browser!</h1>
-            <p>🚀 CloudFreed is a revolutionary new browser designed to provide you with unparalleled freedom while browsing the web. 🌐</p>
-            <p>With CloudFreed, you can access any website without being restricted by annoying <span class="escape">captchas</span> or <span class="escape">Cloudflare's protection</span>. 🛡️</p>
-            <p>We believe in a free and open internet for everyone, and CloudFreed is our contribution to making that a reality. 🌟</p>
-        </div>
-        <br>
-            <div id="chromeVersion" class="title"></div>
-        </br>
-        <div class="title2">CloudFreed is safe for puppeteer or anything similar.</div>
-        <script>
-            window.onload = function() {
-                // Function to get Chrome version
-                function getChromeVersion() {
-                    var raw = navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./);
-                    return raw ? parseInt(raw[2], 10) : false;
-                }
+        /* Hover effects */
+        .cloudfreed-container:hover .cloudfreed-logo {
+            transform: scale(1.05);
+        }
+        .content:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="backgroundCanvas"></canvas>
+
+    <div class="cloudfreed-container" aria-label="CloudFreed Logo and Pulsating Dot">
+        <img src="./CloudFreed.png" alt="CloudFreed Logo" class="cloudfreed-logo">
+    </div>
+    <div class="content" aria-label="CloudFreed Information">
+        <h1>Welcome to CloudFreed Browser!</h1>
+        <p>🚀 CloudFreed is a revolutionary new browser designed to provide you with unparalleled freedom while browsing the web. 🌐</p>
+        <p>With CloudFreed, you can access any website without being restricted by annoying <span class="escape">captchas</span> or <span class="escape">Cloudflare's protection</span>. 🛡️</p>
+        <p>We believe in a free and open internet for everyone, and CloudFreed is our contribution to making that a reality. 🌟</p>
+    </div>
+    <div id="chromeVersion" class="title"></div>
+    <div class="title2">CloudFreed is safe for puppeteer or anything similar.</div>
+
+    <script>
+        window.onload = function() {
+            function getChromeVersion() {
+                var raw = navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./);
+                return raw ? parseInt(raw[2], 10) : false;
+            }
           
-                // Get Chrome version
-                var version = getChromeVersion();
-          
-                // Display Chrome version on the page
-                var message = "Relax, you're on ";
+            var version = getChromeVersion();
+            var message = "Relax, you're on ";
 
-                if (version) {
-                    message += "Chrome v" + version + ".";
-                } else {
-                    message += "a browser that is not Chrome.";
+            if (version) {
+                message += "Chrome v" + version + ".";
+            } else {
+                message += "a browser that is not Chrome.";
+            }
+
+            document.getElementById('chromeVersion').textContent = message;
+
+            // Background
+            const canvas = document.getElementById('backgroundCanvas');
+            const ctx = canvas.getContext('2d');
+            let width, height, particles;
+
+            function init() {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+                particles = [];
+                for (let i = 0; i < 100; i++) {
+                    particles.push(new Particle());
                 }
+            }
 
-                document.getElementById('chromeVersion').textContent = message;
-            };  
-        </script>
-    </body>
+            function Particle() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = Math.random() * 2 - 1;
+                this.vy = Math.random() * 2 - 1;
+                this.size = Math.random() * 3 + 1;
+                this.color = 'rgba(255, 255, 255, ' + Math.random() * 0.5 + ')';
+            }
+
+            Particle.prototype.update = function() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0 || this.x > width) this.vx = -this.vx;
+                if (this.y < 0 || this.y > height) this.vy = -this.vy;
+            };
+
+            Particle.prototype.draw = function() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            };
+
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
+                particles.forEach(particle => {
+                    particle.update();
+                    particle.draw();
+                });
+                requestAnimationFrame(animate);
+            }
+
+            window.addEventListener('resize', init);
+            init();
+            animate();
+        };
+    </script>
+</body>
 </html>

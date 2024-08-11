@@ -7,17 +7,15 @@ const instance = await shahah.start(false)
 
 console.log(instance)
 
-const UserAgent = instance.userAgent
+const test = await instance.SolveIUAM("https://bloxmoon.com")
 
-const clearance = await instance.SolveTurnstile("https://bloxmoon.com/")
+console.log(test)
+
+const UserAgent = instance.userAgent
 
 instance.Close()
 
-//console.log(await shahah.Close())
-//console.log(await shahah.Close())
-console.log(clearance);
-
-const cf = clearance.cfClearance;
+const cf = test.cfClearance;
 
 (async () => {
   // Launch a headless browser
