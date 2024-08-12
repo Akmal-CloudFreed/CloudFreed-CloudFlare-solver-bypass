@@ -1,11 +1,7 @@
-## V3 WILL BE THE BEST CAPTCHA SOLVER TO EXIST.
-V3 will solve cloudflare's turnstile, including cf_3, datadome, hcaptcha, recaptcha, funcaptcha, over 200 types of textcaptchas, and AWS (might add more)
-
 ## STATUS: Active
 
 Updates are on the way!
-V2.3.2 Just released, please report any errors in Issues.
-Running the same link more than once in the same instance will return the same cookie, planning on fixing this in either v3.0.1 or v2.0.2.
+V3.0.1 Just released, please report any errors in Issues.
 
 ## Discord Server
 [![Discord](https://img.shields.io/discord/1219437599740002445.svg?label=Discord&logo=discord&colorB=7289DA)](https://discord.gg/5ncqYYQTPN)
@@ -18,7 +14,7 @@ Files may have problems loading correctly, this is because of the request interc
 ## Introduction
 <div style="text-align:center;">
   <img src="html/CloudFreed.png" alt="CloudFreed Logo" width="48" style="float:left; margin-right:10px;">
-  <h1>CloudFreed v2.3.2</h1>
+  <h1>CloudFreed v3.0.1</h1>
 
   [Join the CloudFreed Server](https://discord.gg/8F852cXVbX)
 </div>
