@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=512, height=512, initial-scale=1.0">
+    <title>CloudFreed</title>
+    <link rel="icon" type="image/png" href="./CloudFreed.png">
+    <style>
+        body {
+            background-color: #121212;
+            color: #E0E0E0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+            overflow: hidden;
+        }
+        .content {
+            background-color: #1E1E1E;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
+            max-width: 90%;
+            margin-top: 10px;
+            border: 1px solid #333;
+            transition: transform 0.3s ease;
+        }
+        .cloudfreed-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        .cloudfreed-logo {
+            width: 96px;
+            height: auto;
+            transition: transform 0.3s ease;
+        }
+        h1 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #FFFFFF;
+        }
+        p {
+            font-size: 14px;
+            line-height: 1.4;
+            margin-bottom: 10px;
+        }
+        .title {
+            font-size: 18px;
+            margin-top: 20px;
+        }
+        .title2 {
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        /* Hover effects */
+        .cloudfreed-container:hover .cloudfreed-logo {
+            transform: scale(1.05);
+        }
+        .content:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="cloudfreed-container" aria-label="CloudFreed Logo">
+        <img src="./CloudFreed.png" alt="CloudFreed Logo" class="cloudfreed-logo">
+    </div>
+    <div id="icons-container" style="display: flex; justify-content: center;">
+        <iframe src="./icons.html" style="border:none; width:100%; height:auto;" onload="resizeIframe(this)"></iframe>
+    </div>
+    <div id="chromeVersion" class="title"></div>
+
+    <script>
+        window.onload = function() {
+            function getChromeVersion() {
+                const raw = navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./);
+                return raw ? parseInt(raw[2], 10) : null;
+            }
+    
+            const version = getChromeVersion();
+            const message = version 
+                ? `Running on Chrome v${version}.` 
+                : "Running on a browser that is not Chrome...";
+    
+            document.getElementById('chromeVersion').textContent = message;
+        };
+    </script>    
+</body>
+</html>

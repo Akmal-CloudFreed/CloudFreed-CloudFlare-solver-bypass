@@ -1,46 +1,22 @@
-import CloudFreed from "./index.js"
-import puppeteer from "puppeteer";
+import CloudFreed from "./index.js";
+import delay from "./lib/delay.js";
 
 const shahah = new CloudFreed()
 
 const instance = await shahah.start(false)
 
-console.log(instance)
+const testTurnstile = await instance.SolveTurnstile("https://www.coronausa.com/", "0x4AAAAAAAH4-VmiV_O_wBN-")
 
-const UserAgent = instance.userAgent
+console.log(testTurnstile)
 
-const clearance = await instance.SolveTurnstile("https://bloxmoon.com/")
+const cf = testTurnstile.response;
 
-instance.Close()
+console.log(cf)
 
-//console.log(await shahah.Close())
-//console.log(await shahah.Close())
-console.log(clearance);
+const testIUAM = await instance.SolveIUAM("https://bloxmoon.com/")
 
-const cf = clearance.cfClearance;
+console.log(testIUAM)
 
-(async () => {
-  // Launch a headless browser
-  const browser = await puppeteer.launch({
-    headless: false,
-    args: [
-        `--user-agent=${UserAgent}`
-    ]
-  });
+const response = testIUAM.cfClearance
 
-  // Create a new page
-  const page = await browser.newPage();
-
-  // Set a cookie
-  await page.setCookie({
-    name: cf.name,
-    value: cf.value,
-    domain: cf.domain,
-    path: cf.path,
-    httpOnly: cf.httpOnly,
-    secure: cf.secure // Replace with the domain of the website
-  });
-
-  // Navigate to a website
-  await page.goto("https://bloxmoon.com/");
-})();
+console.log(response)

@@ -1,7 +1,8 @@
 {
     "name": "cloudfreed",
+    "contributors": ["Akmal", "TheRealStingo"],
     "type": "module",
-    "version": "2.0.1",
+    "version": "3.0.1",
     "description": "CloudFreed, an automated cloudflare solver.",
     "repository": {
         "type": "git",
@@ -9,19 +10,11 @@
     },
     "main": "index.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "node server.js"
+        "test": "echo \"Error: no test specified\" && exit 1"
     },
-    "author": "D4RK",
+    "author": "Akmal",
     "license": "ISC",
     "dependencies": {
-        "extract-zip": "^2.0.1",
-        "http-proxy-agent": "^7.0.2",
-        "https-proxy-agent": "^7.0.4",
-        "node-fetch": "^3.3.2",
-        "puppeteer": "^22.6.2",
-        "socks-proxy-agent": "^8.0.2",
-        "sqlite3": "^5.1.7",
-        "ws": "^8.16.0"
+        "chrome-remote-interface": "^0.33.2"
     }
 }
