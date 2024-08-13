@@ -94,6 +94,7 @@ class CloudFreed {
         `--load-extension=${EXTENSION_PATH}`,
         '--no-first-run',
         '--no-sandbox',
+        '--lang=en',
         `--remote-debugging-port=${port}`,
         '--window-name=CloudFreed',
         '--allow-file-access-from-files',
