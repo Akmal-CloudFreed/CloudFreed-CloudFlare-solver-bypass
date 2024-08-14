@@ -1,7 +1,7 @@
 ## STATUS: Active
 
 Updates are on the way!
-V3.0.1 Just released, please report any errors in Issues.
+V3.0.2 Just released, please report any errors in Issues.
 
 ## Discord Server
 [![Discord](https://img.shields.io/discord/1219437599740002445.svg?label=Discord&logo=discord&colorB=7289DA)](https://discord.gg/5ncqYYQTPN)
@@ -14,7 +14,7 @@ Files may have problems loading correctly, this is because of the request interc
 ## Introduction
 <div style="text-align:center;">
   <img src="html/CloudFreed.png" alt="CloudFreed Logo" width="48" style="float:left; margin-right:10px;">
-  <h1>CloudFreed v3.0.1</h1>
+  <h1>CloudFreed v3.0.2</h1>
 
   [Join the CloudFreed Server](https://discord.gg/8F852cXVbX)
 </div>
@@ -41,12 +41,7 @@ Once Node.js is installed, follow these steps to set up CloudFreed:
 ## Usage
 After installing dependencies, you can start using CloudFreed. The main functionality is provided through the `CloudFreed` function, which returns the `cf_clearence` cookie necessary for bypassing Cloudflare protection.
 
-To use CloudFreed in your project, follow these steps:
-
-1. Open the `server.js` file located in the CloudFreed directory.
-2. Import the `CloudFreed` function into your project.
-3. Call the `CloudFreed` function with the desired URL as an argument. This function will return the `cf_clearence` cookie.
-4. Use the `cf_clearence` cookie in your HTTP requests to the target website to bypass Cloudflare protection.
+To use CloudFreed in your project, look at example.js
 
 ### Example:
 Find example in example.js
