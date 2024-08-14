@@ -32,10 +32,10 @@ class CloudFreed {
 
   /**
    * Starts a CloudFreed Instance
-   * @param {boolean|undefined} headless 
-   * @param {string|undefined} userAgent 
-   * @param {Promise<{host: string, port: number, username: string|undefined, password: string|undefined}>|undefined} proxy 
-   * @returns 
+   * @param {boolean|undefined} headless - Whether the instance should run in headless mode.
+   * @param {string|undefined} userAgent - The user agent string to use.
+   * @param {Promise<{host: string, port: number, username: string|undefined, password: string|undefined}>|undefined} proxy - An optional proxy configuration.
+   * @returns {Promise<Instance>} - Returns a promise that resolves to an instance.
    */
 
   async start(headless, userAgent, proxy) {
@@ -98,6 +98,7 @@ class CloudFreed {
         `--remote-debugging-port=${port}`,
         '--window-name=CloudFreed',
         '--allow-file-access-from-files',
+        '--ignore-certificate-errors',
         `--app=file:///${path.join(__dirname, "html", "CloudFreed.html")}`,
       ];
 
@@ -186,7 +187,7 @@ class CloudFreed {
   async SolveIUAM(url) {
     url = ValidateURL(url);
     console.log('Solving ' + url);
-    const response = await SolveIUAM(this.websocket, url, `file:///${path.join(__dirname, "html", "CloudFreed.html")}`, this.proxy);
+    const response = await SolveIUAM(this.websocket, url, path.join(__dirname, "html", "CloudFreed.html"), this.proxy);
     return response;
   }
 
