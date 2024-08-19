@@ -3,8 +3,8 @@ import delay from "./lib/delay.js";
 
 const shahah = new CloudFreed();
 
-const instance = await shahah.start(false);
-const instance1 = await shahah.start(false);
+const instance = await shahah.start(true);
+const instance1 = await shahah.start(true);
 
 const UserAgent = instance.userAgent
 

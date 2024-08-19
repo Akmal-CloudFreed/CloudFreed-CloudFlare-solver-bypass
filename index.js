@@ -130,7 +130,7 @@ class CloudFreed {
            * Solves Cloudflare's "I'm Under Attack Mode" challenge.
            * Do NOT use the same instance for more than one challenge at once.
            * @param {string} url - The URL to solve the challenge for.
-           * @returns {Promise<{success: boolean, code: number, cfClearance?: Object, cfClearanceHeader?: string}>}
+           * @returns {Promise<{success: boolean, code: number, cfClearance?: Object|undefined}>}
            */
           SolveIUAM: async (url) => {
             url = ValidateURL(url);
@@ -153,7 +153,7 @@ class CloudFreed {
           },
 
           /**
-           * Closes CloudFreed
+           * Closes CloudFreed Instance.
            */
           Close : async () => {
             try {
@@ -161,9 +161,7 @@ class CloudFreed {
                 websocket.close();
               }
 
-
               if (PID) {
-                //chromeProcess.kill();
                 KillProcess(PID);
               }
 
