@@ -19,39 +19,20 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 class CloudFreed {
-  constructor() {
-    this.chromium = GetDefaultChromePath();
-    this.homedir = GetHomeDirectory();
-    this.started = false;
-    this.closed = false;
-    this.PID = null;
-    this.websocket = null;
-    this.UserAgent = null;
-    this.proxy = null;
-  }
-
   /**
    * Starts a CloudFreed Instance
    * @param {boolean|undefined} headless - Whether the instance should run in headless mode.
    * @param {string|undefined} userAgent - The user agent string to use.
    * @param {Promise<{host: string, port: number, username: string|undefined, password: string|undefined}>|undefined} proxy - An optional proxy configuration.
-   * @returns {Promise<Instance>} - Returns a promise that resolves to an instance.
    */
-
   async start(headless, userAgent, proxy) {
     let chromeProcess;
+    const chromium = GetDefaultChromePath();
+    const homedir = GetHomeDirectory();
 
     try {
-      if (this.started) {
-        return {
-          success: false,
-          code: 400,
-          errormessage: "CloudFreed is already running."
-        };
-      }
-
       // Check if OS is valid
-      if (!this.chromium && !this.homedir) {
+      if (!chromium && !homedir) {
         return {
           success: false,
           code: 500,
@@ -61,18 +42,16 @@ class CloudFreed {
 
       // Check if Chrome is installed or uninstalled/misplaced
       try {
-        await fs.access(this.chromium);
+        await fs.access(chromium);
       } catch (error) {
         return {
           success: false,
           code: 500,
-          errormessage: `Google Chrome is not installed on host server, please install Google Chrome and try again.\nAttempted path: ${this.chromium}`
+          errormessage: `Google Chrome is not installed on host server, please install Google Chrome and try again.\nAttempted path: ${chromium}`
         };
       }
 
-      const cloudflareBypassDir = path.join(this.homedir, 'CloudFreed');
-
-      // Delete temporary user data folders
+      const cloudflareBypassDir = path.join(homedir, 'CloudFreed');
       await DeleteTempUserDataFolders(path.join(cloudflareBypassDir, 'DataDirs'));
 
       // Find an available port
@@ -89,12 +68,15 @@ class CloudFreed {
         '--mute-audio',
         '--disable-background-networking',
         '--disable-default-apps',
+        '--disable-translate',
         '--disable-gpu',
         `--disable-extensions-except=${EXTENSION_PATH}`,
         `--load-extension=${EXTENSION_PATH}`,
         '--no-first-run',
         '--no-sandbox',
         '--lang=en',
+        '--disable-sync',
+        '--process-per-site',
         `--remote-debugging-port=${port}`,
         '--window-name=CloudFreed',
         '--allow-file-access-from-files',
@@ -112,20 +94,20 @@ class CloudFreed {
       }
 
       // Launch Chrome in headless mode
-      chromeProcess = spawn(this.chromium, chromeArgs, {
+      chromeProcess = spawn(chromium, chromeArgs, {
         detached: true,
         stdio: 'ignore',
         windowsHide: headless
       });
 
-      this.PID = chromeProcess.pid;
-      this.started = true;
+      const PID = chromeProcess.pid;
       chromeProcess.unref();
 
       // Fetch Chrome version information
       const versionInfo = await CheckDebuggingEndpoint(port);
 
       if (!versionInfo) {
+        await KillProcess(PID);
         return {
           success: false,
           code: 500,
@@ -135,14 +117,12 @@ class CloudFreed {
 
       // If WebSocket debugger URL is available, establish WebSocket connection
       if (versionInfo.webSocketDebuggerUrl) {
-        this.UserAgent = versionInfo['User-Agent'];
-        this.websocket = await CDP({ port });
-        this.proxy = proxy;
+        const websocket = await CDP({ port });
 
         return {
           success: true,
           code: 200,
-          userAgent: this.UserAgent,
+          userAgent: versionInfo['User-Agent'],
           webSocketDebuggerUrl: versionInfo.webSocketDebuggerUrl,
           port,
 
@@ -152,7 +132,12 @@ class CloudFreed {
            * @param {string} url - The URL to solve the challenge for.
            * @returns {Promise<{success: boolean, code: number, cfClearance?: Object, cfClearanceHeader?: string}>}
            */
-          SolveIUAM: async (url) => await this.SolveIUAM(url),
+          SolveIUAM: async (url) => {
+            url = ValidateURL(url);
+            console.log('Solving ' + url);
+            const response = await SolveIUAM(websocket, url, path.join(__dirname, "html", "CloudFreed.html"), proxy);
+            return response;
+          },
 
           /**
            * Solves Cloudflare's "Turnstile" challenge.
@@ -161,12 +146,39 @@ class CloudFreed {
            * @param {string} sitekey - The sitekey of the website to solve the challenge for.
            * @returns {Promise<{success: boolean, code: number, response?: string}>}
            */
-          SolveTurnstile: async (url, sitekey) => await this.SolveTurnstile(url, sitekey),
+          SolveTurnstile: async (url, sitekey) => {
+            console.log('Solving ' + url);
+            const response = await SolveTurnstile(websocket, url, sitekey, `file:///${path.join(__dirname, "html", "CloudFreed.html")}`, proxy);
+            return response;
+          },
 
           /**
            * Closes CloudFreed
            */
-          Close: async () => await this.Close()
+          Close : async () => {
+            try {
+              if (websocket) {
+                websocket.close();
+              }
+
+
+              if (PID) {
+                //chromeProcess.kill();
+                KillProcess(PID);
+              }
+
+              return {
+                success: true,
+                code: 200
+              };
+            } catch {
+              return {
+                success: false,
+                code: 500,
+                errormessage: "Error occurred while closing."
+              };
+            }
+          }
         };
       }
     } catch (error) {
@@ -180,56 +192,6 @@ class CloudFreed {
         code: 500,
         error,
         errormessage: `Error occurred on our side: ${error.message}`
-      };
-    }
-  }
-
-  async SolveIUAM(url) {
-    url = ValidateURL(url);
-    console.log('Solving ' + url);
-    const response = await SolveIUAM(this.websocket, url, path.join(__dirname, "html", "CloudFreed.html"), this.proxy);
-    return response;
-  }
-
-  async SolveTurnstile(url, sitekey) {
-    console.log('Solving ' + url);
-    const response = await SolveTurnstile(this.websocket, url, sitekey, `file:///${path.join(__dirname, "html", "CloudFreed.html")}`, this.proxy);
-    return response;
-  }
-
-  async Close() {
-    try {
-      if (!this.closed) {
-        // Close the WebSocket connection if it exists
-        if (this.websocket) {
-          this.websocket.close();
-          this.websocket = null;
-        }
-
-        // Kill the process if the PID is not null
-        if (this.PID) {
-          await KillProcess(this.PID);
-          this.PID = null;
-        }
-
-        this.closed = true;
-
-        return {
-          success: true,
-          code: 200
-        };
-      } else {
-        return {
-          success: false,
-          code: 400,
-          errormessage: "CloudFreed already closed."
-        };
-      }
-    } catch {
-      return {
-        success: false,
-        code: 500,
-        errormessage: "Error occurred while closing."
       };
     }
   }

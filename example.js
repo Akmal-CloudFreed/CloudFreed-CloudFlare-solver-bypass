@@ -1,24 +1,23 @@
 import CloudFreed from "./index.js";
 import delay from "./lib/delay.js";
 
-const shahah = new CloudFreed()
+const shahah = new CloudFreed();
 
-const instance = await shahah.start(false, undefined, { host: "http://152.26.229.57", port: 9443 })
+const instance = await shahah.start(false);
+const instance1 = await shahah.start(false);
 
-const testTurnstile = await instance.SolveTurnstile("https://www.coronausa.com/", "0x4AAAAAAAH4-VmiV_O_wBN-")
+const UserAgent = instance.userAgent
 
-console.log(testTurnstile)
+// Run both IUAM and Turnstile challenges
+const [testIUAM, testTurnstile] = await Promise.all([
+  instance.SolveIUAM("https://bloxmoon.com/"),
+  instance1.SolveTurnstile("https://www.coronausa.com/", "0x4AAAAAAAH4-VmiV_O_wBN-")
+]);
 
-const cf = testTurnstile.response;
+console.log(UserAgent)
+console.log(testIUAM);
+console.log(testTurnstile);
 
-console.log(cf)
-
-const testIUAM = await instance.SolveIUAM("https://bloxmoon.com/")
-
-console.log(testIUAM)
-
-const response = testIUAM.cfClearance
-
-console.log(response)
-
-instance.Close()
+// Close the instance
+await instance.Close();
+await instance1.Close();
