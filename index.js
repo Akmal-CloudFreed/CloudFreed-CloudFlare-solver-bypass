@@ -8,6 +8,7 @@ import CheckDebuggingEndpoint from "./lib/CheckDebuggingEndpoint.js";
 import KillProcess from "./lib/KillProcess.js";
 import SolveIUAM from "./lib/SolveIUAM.js";
 import SolveTurnstile from "./lib/SolveTurnstile.js";
+import SolveV3 from "./lib/SolveV3.js";
 
 // Separate library imports from module imports
 import CDP from "chrome-remote-interface";
@@ -15,6 +16,7 @@ import fs from "fs/promises";
 import { spawn } from "child_process";
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { randomInt } from "crypto";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -56,7 +58,8 @@ class CloudFreed {
 
       // Find an available port
       const port = await FindAvailablePort(10000, 60000);
-      const dataDir = path.join(cloudflareBypassDir, 'DataDirs', `CloudFreed_${Date.now()}`);
+      const random8DigitNumber = Math.floor(10000000 + Math.random() * 90000000);
+      const dataDir = path.join(cloudflareBypassDir, 'DataDirs', `CloudFreed_${Date.now()+random8DigitNumber}`);
       const EXTENSION_PATH = path.join(__dirname, "lib", "turnstilePatch");
 
       // Configure Chrome arguments
@@ -67,6 +70,7 @@ class CloudFreed {
         '--disable-software-rasterizer',
         '--mute-audio',
         '--disable-background-networking',
+        '--disable-web-security',
         '--disable-default-apps',
         '--disable-translate',
         '--disable-gpu',
@@ -133,9 +137,13 @@ class CloudFreed {
            * @returns {Promise<{success: boolean, code: number, cfClearance?: Object|undefined}>}
            */
           SolveIUAM: async (url) => {
+            if (typeof url !== "string") {
+              return {success: false, code: 401, errormessage: "Invalid argument entered, please double check your request."}
+            }
+            
             url = ValidateURL(url);
             console.log('Solving ' + url);
-            const response = await SolveIUAM(websocket, url, path.join(__dirname, "html", "CloudFreed.html"), proxy);
+            const response = await SolveIUAM(websocket, url, `file:///${path.join(__dirname, "html", "CloudFreed.html")}`, proxy);
             return response;
           },
 
@@ -147,8 +155,30 @@ class CloudFreed {
            * @returns {Promise<{success: boolean, code: number, response?: string}>}
            */
           SolveTurnstile: async (url, sitekey) => {
+            if (typeof url !== "string" || typeof sitekey !== "string") {
+              return {success: false, code: 401, errormessage: "Invalid argument entered, please double check your request."}
+            }
+
+            url = ValidateURL(url);
             console.log('Solving ' + url);
             const response = await SolveTurnstile(websocket, url, sitekey, `file:///${path.join(__dirname, "html", "CloudFreed.html")}`, proxy);
+            return response;
+          },
+
+          /**
+           * Solves Cloudflare's "V3" challenge.
+           * Do NOT use the same instance for more than one challenge at once.
+           * @param {string} url - The URL to solve the challenge for.
+           * @returns {Promise<{success: boolean, code: number, cfClearance?: Object|undefined}>}
+           */
+          SolveV3: async (url) => {
+            if (typeof url !== "string") {
+              return {success: false, code: 401, errormessage: "Invalid argument entered, please double check your request."}
+            }
+
+            url = ValidateURL(url);
+            console.log('Solving ' + url);
+            const response = await SolveV3(websocket, url, `file:///${path.join(__dirname, "html", "CloudFreed.html")}`, proxy);
             return response;
           },
 
