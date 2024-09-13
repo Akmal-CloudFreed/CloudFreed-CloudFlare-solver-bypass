@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "Dynamic Proxy Switcher",
+  "version": "1.0",
+  "permissions": [
+    "proxy",
+    "storage",
+    "alarms",
+    "tabs",
+    "activeTab",
+    "offscreen",
+    "scripting",
+    "declarativeNetRequest"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "host_permissions": [
+    "<all_urls>",
+    "file:///*"
+  ],
+  "content_scripts": [
+    {
+        "js": [
+            "./script.js"
+        ],
+        "matches": [
+            "<all_urls>"
+        ],
+        "run_at": "document_start",
+        "all_frames": true,
+        "world": "MAIN"
+    }
+  ],
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyaj9HL/FT30C8fzyPJ5zrSIqUlUfufpWFpjg6PMkNcaSVVQMls7CJtq6Je493v4kNQRsmDl46tSKOmQ6y/b9OMKqdybuq1vQMxRkyiU3Ib3dCqTIk/oZ7t5wkVIwCONtPf85IQWAGP1NLqw0k51eda7m6QOkW092yPNCR/Y/LA0ZiXYU2qifn1H+f0HXqkyS3go+2TyfmIiiNRVJNUg+8OtcbcRCIcFPi/6l29jzbOgF39tepAss0MBLcdB6TjHWIU6JZfSjZ2xtUXkRmiec0FwiRgVmdIuwZuT2oQlpy6uOCopKZD6sSeMIA6b84/WzDIuZeyzfGvpRzj7OOWJDawIDAQAB"
+}

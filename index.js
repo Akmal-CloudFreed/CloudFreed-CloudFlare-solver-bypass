@@ -6,9 +6,8 @@ import DeleteTempUserDataFolders from "./lib/DeleteTempUserDataFolders.js";
 import FindAvailablePort from "./lib/FindAvailablePort.js";
 import CheckDebuggingEndpoint from "./lib/CheckDebuggingEndpoint.js";
 import KillProcess from "./lib/KillProcess.js";
-import SolveIUAM from "./lib/SolveIUAM.js";
-import SolveTurnstile from "./lib/SolveTurnstile.js";
-import SolveV3 from "./lib/SolveV3.js";
+import Solve from "./lib/Solve.js";
+import Click from "./lib/Click.js";
 
 // Separate library imports from module imports
 import CDP from "chrome-remote-interface";
@@ -16,21 +15,20 @@ import fs from "fs/promises";
 import { spawn } from "child_process";
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { randomInt } from "crypto";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const EXTENSION_PATH = path.join(__dirname, "lib", "proxyManager");
+const chromium = GetDefaultChromePath();
+const homedir = GetHomeDirectory();
 
 class CloudFreed {
   /**
    * Starts a CloudFreed Instance
    * @param {boolean|undefined} headless - Whether the instance should run in headless mode.
-   * @param {string|undefined} userAgent - The user agent string to use.
-   * @param {Promise<{host: string, port: number, username: string|undefined, password: string|undefined}>|undefined} proxy - An optional proxy configuration.
+   * @param {boolean|undefined} proxyOverride
    */
-  async start(headless, userAgent, proxy) {
+  async start(headless, proxyOverride) {
     let chromeProcess;
-    const chromium = GetDefaultChromePath();
-    const homedir = GetHomeDirectory();
 
     try {
       // Check if OS is valid
@@ -60,7 +58,6 @@ class CloudFreed {
       const port = await FindAvailablePort(10000, 60000);
       const random8DigitNumber = Math.floor(10000000 + Math.random() * 90000000);
       const dataDir = path.join(cloudflareBypassDir, 'DataDirs', `CloudFreed_${Date.now()+random8DigitNumber}`);
-      const EXTENSION_PATH = path.join(__dirname, "lib", "turnstilePatch");
 
       // Configure Chrome arguments
       const chromeArgs = [
@@ -71,37 +68,38 @@ class CloudFreed {
         '--mute-audio',
         '--disable-background-networking',
         '--disable-web-security',
+        '--disk-cache-size=1',
         '--disable-default-apps',
         '--disable-translate',
+        '--disk-cache-size=0',
+        '--disable-application-cache',
         '--disable-gpu',
+        '--disable-features=CookiesWithoutSameSiteMustBeSecure',
         `--disable-extensions-except=${EXTENSION_PATH}`,
         `--load-extension=${EXTENSION_PATH}`,
         '--no-first-run',
+        '--disable-blink-features=AutomationControlled',
         '--no-sandbox',
+        '--disable-setuid-sandbox',
         '--lang=en',
         '--disable-sync',
-        '--process-per-site',
         `--remote-debugging-port=${port}`,
         '--window-name=CloudFreed',
         '--allow-file-access-from-files',
         '--ignore-certificate-errors',
+        '--disable-infobars',
+        '--user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"', // default user agent if the user inputs no UA, it get outputted in the response.
         `--app=file:///${path.join(__dirname, "html", "CloudFreed.html")}`,
       ];
 
-      if (proxy?.host && proxy?.port) {
-        console.log("Proxy added:", proxy);
-        chromeArgs.push(`--proxy-server=${proxy.host}:${proxy.port}`);
-      }
-
-      if (typeof userAgent === "string") {
-        chromeArgs.push(`--user-agent="${userAgent}"`);
+      if (headless === true) {
+        chromeArgs.push('--headless=new')
       }
 
       // Launch Chrome in headless mode
       chromeProcess = spawn(chromium, chromeArgs, {
         detached: true,
-        stdio: 'ignore',
-        windowsHide: headless
+        stdio: 'ignore'
       });
 
       const PID = chromeProcess.pid;
@@ -120,75 +118,172 @@ class CloudFreed {
       }
 
       // If WebSocket debugger URL is available, establish WebSocket connection
-      if (versionInfo.webSocketDebuggerUrl) {
-        const websocket = await CDP({ port });
+      if (versionInfo.webSocketDebuggerUrl && versionInfo["User-Agent"]) {
+        let solving = false
+        const originalUserAgent = versionInfo["User-Agent"].includes("Headless") ? versionInfo["User-Agent"].replace("Headless", "") : versionInfo["User-Agent"]
+        console.log("Process started with " + originalUserAgent + " user agent")
+        const client = await CDP({ port });
+        let target = null, extensionTarget = null, targetId, sessionId = null, extensionSessionId = null;
+    
+        for (let i = 0; i < 10; i++) {  // Try up to 10 times
+            const targets = (await client.Target.getTargets()).targetInfos;
+            target = targets.find(t => t.type === "page" && t.title === "CloudFreed");
+            extensionTarget = targets.find(t => t.type === "service_worker" && t.url.includes('mgenfpnpknddpgmficgohhkmpndifgad'));
+    
+            if (target && extensionTarget) {
+              break;  // Exit the loop if the target is found
+            }
+    
+            await delay(500)  // Wait for 500ms before retrying
+        }
+    
+        if (target && extensionTarget && target.targetId && extensionTarget.targetId) {
+          targetId = target.targetId;
+          const extensionTargetId = extensionTarget.targetId
+          extensionSessionId = (await client.Target.attachToTarget({ targetId: extensionTargetId, flatten: true })).sessionId;
+          sessionId = (await client.Target.attachToTarget({ targetId, flatten: true })).sessionId;
+        } else {
+          return {
+            success: false,
+            code: 500,
+            errormessage: "Error occurred while initializing."
+          };
+        }
+
+        await client.Network.enable();
+        await client.DOM.enable(sessionId)
+        await client.Log.enable(sessionId)
+        await client.Network.setCacheDisabled({ cacheDisabled: true })
+        await client.Emulation.setFocusEmulationEnabled({ enabled: true }, sessionId)
+        Click(client, sessionId)
+
+        let solve = new Solve(client, sessionId, originalUserAgent, extensionSessionId, proxyOverride)
 
         return {
           success: true,
           code: 200,
-          userAgent: versionInfo['User-Agent'],
+          userAgent: originalUserAgent,
           webSocketDebuggerUrl: versionInfo.webSocketDebuggerUrl,
           port,
 
           /**
-           * Solves Cloudflare's "I'm Under Attack Mode" challenge.
-           * Do NOT use the same instance for more than one challenge at once.
-           * @param {string} url - The URL to solve the challenge for.
-           * @returns {Promise<{success: boolean, code: number, cfClearance?: Object|undefined}>}
+           * Solves CloudFlare Challenge.
+           * @param {CDP.Client} client
+           * @param {{url: string, type: string, sitekey: string|undefined, userAgent: string|undefined, action:string|undefined, proxy: {scheme: string, host: string, port: Number, username: string|undefined, password: string|undefined}}} data
+           * @param {string} sessionId
            */
-          SolveIUAM: async (url) => {
-            if (typeof url !== "string") {
-              return {success: false, code: 401, errormessage: "Invalid argument entered, please double check your request."}
+          Solve: async (data) => {
+            try {
+              if (solving === false) {
+                if (typeof data === "object") {
+                  if (data.url && typeof data.url === "string") {
+                    if (data.type && typeof data.type === "string") {
+                      solving = true
+                      data.url = ValidateURL(data.url);
+                      console.log('Solving ' + data.url);
+
+                      const solveWithTimeout = new Promise(async (resolve, reject) => {
+                        try {
+                          const response = await solve.Solve(data);
+
+                          await client.Network.disable(sessionId)
+
+                          await client.Page.navigate({ url: `file:///${path.join(__dirname, "html", "CloudFreed.html")}` }, sessionId);
+                          
+                          solving = false
+
+                          resolve(response);
+                        } catch (error) {
+                          solving = false
+                          
+                          resolve({
+                            success: false,
+                            code: 500,
+                            errormessage: "Error occurred while initializing.",
+                            error
+                          });
+                        }
+                      });
+
+                      const timeout = new Promise((resolve) => {
+                        let elapsed = 0;
+                      
+                        const interval = setInterval(async () => {
+                          elapsed += 1;
+                      
+                          // Check if the solving flag is false or if we've reached 60 seconds (60 iterations)
+                          if (solving === false || elapsed >= 60) {
+                            clearInterval(interval); // Stop the interval after 60 seconds or if solving is false
+                      
+                            if (solving === true) {
+                              try {
+                                // Navigate the page if solving is still true after 60 seconds
+                                await client.Page.navigate({ url: `file:///${path.join(__dirname, "html", "CloudFreed.html")}` }, sessionId);
+                      
+                                solving = false;
+                      
+                                resolve({ success: false, code: 408, errormessage: "Request timed out after 60 seconds." });
+                              } catch (error) {
+                                resolve({ success: false, code: 408, errormessage: "Request timed out with an error after 60 seconds." });
+                              }
+                            } else {
+                              return; // Resolve immediately if solving became false before 60 seconds
+                            }
+                          }
+                        }, 1000); // Run every 1 second
+                      });                      
+
+                      // Use Promise.race to return whichever promise resolves first (response or timeout)
+                      const result = await Promise.race([solveWithTimeout, timeout]);
+
+                      solving = false
+
+                      return result;
+                    } else {
+                      return {
+                        success: false,
+                        code: 400,
+                        errormessage: `Invalid input: Expected data.type to be of type "string", but received "${typeof data.url}".`
+                      };
+                    }
+                  } else {
+                    return {
+                      success: false,
+                      code: 400,
+                      errormessage: `Invalid input: Expected data.url to be of type "string", but received "${typeof data.url}".`
+                    };
+                  }
+                } else {
+                  return {
+                    success: false,
+                    code: 400,
+                    errormessage: `Invalid input: Expected data to be of type "Object", but received "${typeof data}".`
+                  };
+                }
+              } else {
+                return {
+                  success: false,
+                  code: 503,
+                  errormessage: "Instance currently busy."
+                };
+              }
+            } catch (error) {
+              return {
+                success: false,
+                code: 500,
+                errormessage: "Error occurred while initializing.",
+                error
+              };
             }
-            
-            url = ValidateURL(url);
-            console.log('Solving ' + url);
-            const response = await SolveIUAM(websocket, url, `file:///${path.join(__dirname, "html", "CloudFreed.html")}`, proxy);
-            return response;
-          },
-
-          /**
-           * Solves Cloudflare's "Turnstile" challenge.
-           * Do NOT use the same instance for more than one challenge at once.
-           * @param {string} url - The URL to solve the challenge for.
-           * @param {string} sitekey - The sitekey of the website to solve the challenge for.
-           * @returns {Promise<{success: boolean, code: number, response?: string}>}
-           */
-          SolveTurnstile: async (url, sitekey) => {
-            if (typeof url !== "string" || typeof sitekey !== "string") {
-              return {success: false, code: 401, errormessage: "Invalid argument entered, please double check your request."}
-            }
-
-            url = ValidateURL(url);
-            console.log('Solving ' + url);
-            const response = await SolveTurnstile(websocket, url, sitekey, `file:///${path.join(__dirname, "html", "CloudFreed.html")}`, proxy);
-            return response;
-          },
-
-          /**
-           * Solves Cloudflare's "V3" challenge.
-           * Do NOT use the same instance for more than one challenge at once.
-           * @param {string} url - The URL to solve the challenge for.
-           * @returns {Promise<{success: boolean, code: number, cfClearance?: Object|undefined}>}
-           */
-          SolveV3: async (url) => {
-            if (typeof url !== "string") {
-              return {success: false, code: 401, errormessage: "Invalid argument entered, please double check your request."}
-            }
-
-            url = ValidateURL(url);
-            console.log('Solving ' + url);
-            const response = await SolveV3(websocket, url, `file:///${path.join(__dirname, "html", "CloudFreed.html")}`, proxy);
-            return response;
           },
 
           /**
            * Closes CloudFreed Instance.
            */
-          Close : async () => {
+          Close: async () => {
             try {
-              if (websocket) {
-                websocket.close();
+              if (client) {
+                client.close();
               }
 
               if (PID) {

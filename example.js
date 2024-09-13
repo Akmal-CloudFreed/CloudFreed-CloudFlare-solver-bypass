@@ -1,30 +1,65 @@
-import CloudFreed from "./index.js";
-import delay from "./lib/delay.js";
+import CloudFreed from "./index.js"
+import delay from "./lib/delay.js"
 
-// start new CloudFreed class
-const cloudfreed = new CloudFreed();
+/* 
+documentation for instance.Solve data.
 
-// start browser instances, arguments: headless: boolean, userAgent: string/undefined, proxy: JSON<{host: string, port: number, username:string/undefined, password: string/undefined}>/undefined
-const instance = await cloudfreed.start(true);
-const instance1 = await cloudfreed.start(true);
-const instance2 = await cloudfreed.start(true);
+(property) Solve?: ((data: {
+  url: string;
+  type: string;
+  sitekey: string | undefined;
+  userAgent: string | undefined;
+  action: string | undefined;
+  proxy: {
+      scheme: string;
+      host: string;
+      port: number;
+      username: string | undefined;
+      password: string | undefined;
+  };
+}) => Promise<...>) | undefined
+*/
 
-// log userAgent being used in instance.
-const UserAgent = instance.userAgent;
+const CF = new CloudFreed()
 
-// Run both IUAM and Turnstile challenges
-const [testIUAM, testTurnstile, testV3] = await Promise.all([
-  instance.SolveIUAM("bloxmoon.com"),
-  instance1.SolveTurnstile("www.coronausa.com", "0x4AAAAAAAH4-VmiV_O_wBN-"),
-  instance2.SolveV3("discord.com")
-]);
+const instance = await CF.start(false, true)
 
-console.log(UserAgent);
-console.log(testIUAM);
-console.log(testTurnstile);
-console.log(testV3);
+console.log(await instance.Solve({
+  type: "Turnstile",
+  url: "www.coronausa.com",
+  sitekey: "0x4AAAAAAAH4-VmiV_O_wBN-",
+  //proxy: { scheme: "http", host: "152.26.229.42", port: 9443 },
+  userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
+}))
 
-// Close the instance
-await instance.Close();
-await instance1.Close();
-await instance2.Close();
+console.log(await instance.Solve({
+  type: "RecaptchaInvisible",
+  url: "https://antcpt.com/score_detector/",
+  sitekey: "6LcR_okUAAAAAPYrPe-HK_0RULO1aZM15ENyM-Mf",
+  action: "homepage",
+  //proxy: { scheme: "http", host: "152.26.229.42", port: 9443 },
+  userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
+}))
+
+console.log(await instance.Solve({
+  type: "Invisible",
+  url: "discord.com",
+  //proxy: { scheme: "http", host: "152.26.229.42", port: 9443 },
+  userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
+}))
+
+console.log(await instance.Solve({
+  type: "IUAM",
+  url: "bloxmoon.com",
+  //proxy: { scheme: "http", host: "152.26.229.42", port: 9443 },
+  userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
+}))
+
+console.log(await instance.Solve({
+  type: "V3",
+  url: "www.subber.xyz",
+  //proxy: { scheme: "http", host: "152.26.229.42", port: 9443 },
+  userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
+}))
+
+await instance.Close()
