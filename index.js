@@ -7,7 +7,6 @@ import FindAvailablePort from "./lib/FindAvailablePort.js";
 import CheckDebuggingEndpoint from "./lib/CheckDebuggingEndpoint.js";
 import KillProcess from "./lib/KillProcess.js";
 import Solve from "./lib/Solve.js";
-import Click from "./lib/Click.js";
 
 // Separate library imports from module imports
 import CDP from "chrome-remote-interface";
@@ -17,7 +16,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const EXTENSION_PATH = path.join(__dirname, "lib", "proxyManager");
+const EXTENSION_PATH = path.join(__dirname, "lib", "Extension");
 const chromium = GetDefaultChromePath();
 const homedir = GetHomeDirectory();
 
@@ -88,7 +87,7 @@ class CloudFreed {
         '--allow-file-access-from-files',
         '--ignore-certificate-errors',
         '--disable-infobars',
-        '--user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"', // default user agent if the user inputs no UA, it get outputted in the response.
+        //'--user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"', // default user agent if the user inputs no UA, it get outputted in the response.
         `--app=file:///${path.join(__dirname, "html", "CloudFreed.html")}`,
       ];
 
@@ -128,7 +127,7 @@ class CloudFreed {
         for (let i = 0; i < 10; i++) {  // Try up to 10 times
             const targets = (await client.Target.getTargets()).targetInfos;
             target = targets.find(t => t.type === "page" && t.title === "CloudFreed");
-            extensionTarget = targets.find(t => t.type === "service_worker" && t.url.includes('mgenfpnpknddpgmficgohhkmpndifgad'));
+            extensionTarget = targets.find(t => t.type === "service_worker");
     
             if (target && extensionTarget) {
               break;  // Exit the loop if the target is found
@@ -155,7 +154,6 @@ class CloudFreed {
         await client.Log.enable(sessionId)
         await client.Network.setCacheDisabled({ cacheDisabled: true })
         await client.Emulation.setFocusEmulationEnabled({ enabled: true }, sessionId)
-        Click(client, sessionId)
 
         let solve = new Solve(client, sessionId, originalUserAgent, extensionSessionId, proxyOverride)
 
@@ -185,8 +183,6 @@ class CloudFreed {
                       const solveWithTimeout = new Promise(async (resolve, reject) => {
                         try {
                           const response = await solve.Solve(data);
-
-                          await client.Network.disable(sessionId)
 
                           await client.Page.navigate({ url: `file:///${path.join(__dirname, "html", "CloudFreed.html")}` }, sessionId);
                           

@@ -24,6 +24,17 @@ const CF = new CloudFreed()
 
 const instance = await CF.start(false, true)
 
+console.log(instance)
+
+console.log(await instance.Solve({
+  type: "V3",
+  url: "www.subber.xyz",
+  //proxy: { scheme: "http", host: "152.26.229.42", port: 9443 },
+  userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"
+}))
+
+await delay(3723498) // optional, stop (kinda) after testing V3.
+
 console.log(await instance.Solve({
   type: "Turnstile",
   url: "www.coronausa.com",
