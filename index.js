@@ -127,7 +127,7 @@ class CloudFreed {
         for (let i = 0; i < 10; i++) {  // Try up to 10 times
             const targets = (await client.Target.getTargets()).targetInfos;
             target = targets.find(t => t.type === "page" && t.title === "CloudFreed");
-            extensionTarget = targets.find(t => t.type === "service_worker");
+            extensionTarget = targets.find((t) => t.type === "service_worker" && !t.url.includes("neajdpp"));
     
             if (target && extensionTarget) {
               break;  // Exit the loop if the target is found
